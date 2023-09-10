@@ -9,13 +9,15 @@ export default async function Home() {
   const isAuth = !!userId;
 
   return (
-    <div className="min-h-screen w-screen bg-gradient-to-r from-red-200 via-purple-100 to-violet-400">
-      <div className="flex justify-end p-4 ">
-        <div className="rounded-xl bg-white/60 p-2">
-          <UserButton afterSignOutUrl="/" showName />
+    <div className="w-screen min-h-screen bg-gradient-to-r from-red-200 via-purple-100 to-violet-400">
+      {isAuth && (
+        <div className="flex justify-end p-4 ">
+          <div className="p-2 rounded-xl bg-white/60">
+            <UserButton afterSignOutUrl="/" showName />
+          </div>
         </div>
-      </div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+      )}
+      <div className="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
         <div className="flex flex-col items-center text-center">
           <div className="flex items-center">
             <h1 className="mr-3 text-5xl font-semibold">PDF IntelliQuery</h1>
@@ -23,7 +25,7 @@ export default async function Home() {
           <div className="flex mt-3">
             {isAuth && <Button>Go to Chats</Button>}
           </div>
-          <p className="text-lg text-slate-600 mt-1 max-w-xl">
+          <p className="max-w-xl mt-2 text-lg text-slate-600">
             Join millions of students, researchers and professionals who use PDF
             IntelliQuery to get more done, faster.
           </p>

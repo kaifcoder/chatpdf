@@ -1,9 +1,15 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Poppins } from "next/font/google";
+import Provider from "@/components/Provider";
 
-const inter = Inter({ subsets: ["latin"] });
+import ToasterProvider from "@/components/ToasterProvider";
+
+const inter = Poppins({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+});
 
 export const metadata: Metadata = {
   title: "PDF IntelliQuery",
@@ -17,9 +23,14 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body className={inter.className}>{children}</body>
-      </html>
+      <Provider>
+        <html lang="en" suppressHydrationWarning>
+          <body className={inter.className}>
+            <ToasterProvider />
+            {children}
+          </body>
+        </html>
+      </Provider>
     </ClerkProvider>
   );
 }
