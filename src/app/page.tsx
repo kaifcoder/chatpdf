@@ -1,4 +1,5 @@
 import FileUpload from "@/components/FileUpload";
+import GoToChats from "@/components/GoToChats";
 import { Button } from "@/components/ui/button";
 import { UserButton, auth } from "@clerk/nextjs";
 import { LogIn } from "lucide-react";
@@ -22,9 +23,7 @@ export default async function Home() {
           <div className="flex items-center">
             <h1 className="mr-3 text-5xl font-semibold">PDF IntelliQuery</h1>
           </div>
-          <div className="flex mt-3">
-            {isAuth && <Button>Go to Chats</Button>}
-          </div>
+          <GoToChats auth={isAuth} />
           <p className="max-w-xl mt-2 text-lg text-slate-600">
             Join millions of students, researchers and professionals who use PDF
             IntelliQuery to get more done, faster.

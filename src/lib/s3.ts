@@ -52,17 +52,6 @@ export async function UploadToS3(file: File) {
 }
 
 export function getS3Url(file_key: string) {
-  const s3 = new AWS.S3({
-    params: {
-      Bucket: process.env.NEXT_PUBLIC_AWS_BUCKET_NAME,
-    },
-    region: "ap-south-1",
-  });
-  const params = {
-    Bucket: process.env.NEXT_PUBLIC_AWS_BUCKET_NAME!,
-    Key: file_key,
-  };
-  const url = s3.getSignedUrl("getObject", params);
-  console.log(url);
+  const url = `https://${process.env.NEXT_PUBLIC_AWS_BUCKET_NAME}.s3.ap-south-1.amazonaws.com/${file_key}`;
   return url;
 }
