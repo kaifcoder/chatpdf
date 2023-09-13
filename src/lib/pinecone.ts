@@ -42,6 +42,7 @@ export async function loadS3intoPincone(file_key: string) {
   }
   const loader = new PDFLoader(file_name);
   const pages = (await loader.load()) as PDFPage[];
+  console.log("LOADED PAGES", pages);
 
   //2. Split the pages into chunks of 1000
   const docs = await Promise.all(pages.map(prepareDocument));
@@ -93,7 +94,7 @@ async function prepareDocument(page: PDFPage) {
       pageContent,
       metadata: {
         pageNumber: metadata.loc.pageNumber,
-        text: truncateStringsByBytes(pageContent, 36000),
+        text: truncateStringsByBytes(pageContent, 46000),
       },
     }),
   ]);

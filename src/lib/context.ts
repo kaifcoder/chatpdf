@@ -18,7 +18,7 @@ export async function getMatchesfromEmbeddings(
 
     const queryResult = await index.query({
       queryRequest: {
-        topK: 3,
+        topK: 4,
         vector: embeddings,
         includeMetadata: true,
         namespace,
@@ -43,5 +43,5 @@ export async function getContext(query: string, fileKey: string) {
   };
   let docs = qualifyingDocs?.map((doc) => (doc.metadata as metadata).text);
   // 5 para from 5 vectors
-  return docs?.join("\n").substring(0, 3000);
+  return docs?.join("\n").substring(0, 5000);
 }
