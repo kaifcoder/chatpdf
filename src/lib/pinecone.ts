@@ -42,13 +42,12 @@ export async function loadS3intoPincone(file_key: string) {
   }
   const loader = new PDFLoader(file_name);
   const pages = (await loader.load()) as PDFPage[];
-  console.log("LOADED PAGES", pages);
 
   //2. Split the pages into chunks of 1000
   const docs = await Promise.all(pages.map(prepareDocument));
 
   //3. vectorize the documents
-  const vectors = await Promise.all(docs.flat().map(embeddDocs));
+  const vectors = await processDocs(docs.flat());
 
   //4. upload the vectors to pinecone
   const client = await getPineconeClient();
@@ -57,6 +56,27 @@ export async function loadS3intoPincone(file_key: string) {
   PineconeUtils.chunkedUpsert(pineconeIndex, vectors, namespace, 10);
 
   return docs[0];
+}
+
+async function processDocs(docs: Document[]) {
+  const vectors = [];
+
+  for (let i = 0; i < docs.length; i++) {
+    if (i % 3 === 0 && i > 0) {
+      // Add a 1-minute delay after every 3 consecutive calls
+      await new Promise((resolve) => setTimeout(resolve, 60000));
+    }
+
+    const doc = docs[i];
+    try {
+      const vector = await embeddDocs(doc);
+      vectors.push(vector);
+    } catch (error) {
+      console.error("ERROR PROCESSING DOC", error);
+    }
+  }
+
+  return vectors;
 }
 
 async function embeddDocs(doc: Document) {
