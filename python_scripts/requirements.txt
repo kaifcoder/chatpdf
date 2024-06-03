@@ -1,0 +1,5 @@
+colorama==0.4.6
+docx2pdf==0.1.8
+PyPDF2==3.0.1
+pywin32==306
+tqdm==4.66.1

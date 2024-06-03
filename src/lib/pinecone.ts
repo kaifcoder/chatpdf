@@ -1,7 +1,7 @@
 import {
-  PineconeClient,
-  Vector,
-  utils as PineconeUtils,
+  Pinecone,
+  PineconeRecord,
+  RecordMetadata,
 } from "@pinecone-database/pinecone";
 import { downloadFromS3 } from "./s3-server";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
@@ -9,17 +9,16 @@ import {
   Document,
   RecursiveCharacterTextSplitter,
 } from "@pinecone-database/doc-splitter";
-import { getEmbeddings } from "./embeddings";
+import { getEmbeddingsfrompython } from "./embeddings";
 import md5 from "md5";
 import { convertToASCII } from "./utils";
+import { Vector } from "@pinecone-database/pinecone/dist/pinecone-generated-ts-fetch";
 
-let pinecone: PineconeClient | null = null;
+let pinecone: Pinecone | null = null;
 
 export const getPineconeClient = async () => {
   if (!pinecone) {
-    pinecone = new PineconeClient();
-    await pinecone.init({
-      environment: process.env.PINECONE_ENVIRONMENT!,
+    pinecone = new Pinecone({
       apiKey: process.env.PINECONE_API_KEY!,
     });
   }
@@ -51,9 +50,11 @@ export async function loadS3intoPincone(file_key: string) {
 
   //4. upload the vectors to pinecone
   const client = await getPineconeClient();
-  const pineconeIndex = client.Index("pdfintelliquery");
+  const pineconeIndex = client.Index("chatpdf");
   const namespace = convertToASCII(file_key);
-  PineconeUtils.chunkedUpsert(pineconeIndex, vectors, namespace, 10);
+  await pineconeIndex
+    .namespace(namespace)
+    .upsert(vectors as PineconeRecord<RecordMetadata>[]);
 
   return docs[0];
 }
@@ -62,11 +63,6 @@ async function processDocs(docs: Document[]) {
   const vectors = [];
 
   for (let i = 0; i < docs.length; i++) {
-    if (i % 3 === 0 && i > 0) {
-      // Add a 1-minute delay after every 3 consecutive calls
-      await new Promise((resolve) => setTimeout(resolve, 60000));
-    }
-
     const doc = docs[i];
     try {
       const vector = await embeddDocs(doc);
@@ -81,7 +77,7 @@ async function processDocs(docs: Document[]) {
 
 async function embeddDocs(doc: Document) {
   try {
-    const embedding = await getEmbeddings(doc.pageContent);
+    const embedding = await getEmbeddingsfrompython(doc.pageContent);
     const hash = md5(doc.pageContent);
     return {
       id: hash,

@@ -30,6 +30,7 @@ export async function POST(req: Request) {
     const lastmessage = messages[messages.length - 1];
 
     const context = await getContext(lastmessage.content, fileKey);
+    console.log("CONTEXT", context);
     const prompt = {
       role: "system",
       content: `AI assistant is a brand new, powerful, human-like artificial intelligence.
@@ -76,5 +77,7 @@ export async function POST(req: Request) {
       },
     });
     return new StreamingTextResponse(stream);
-  } catch (error) {}
+  } catch (error) {
+    return "error occured";
+  }
 }

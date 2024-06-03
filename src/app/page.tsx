@@ -10,7 +10,7 @@ export default async function Home() {
   const isAuth = !!userId;
 
   return (
-    <div className="w-screen min-h-screen bg-gradient-to-r from-red-200 via-purple-100 to-violet-400">
+    <div className="w-screen min-h-screen bg-gradient-to-r from-red-200 via-purple-100 to-violet-400 ">
       {isAuth && (
         <div className="flex justify-end p-4 ">
           <div className="p-2 rounded-xl bg-white/60">

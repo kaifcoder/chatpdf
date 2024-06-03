@@ -1,29 +1,29 @@
-import { PineconeClient } from "@pinecone-database/pinecone";
+import {
+  Pinecone,
+  PineconeRecord,
+  RecordMetadata,
+} from "@pinecone-database/pinecone";
 import { convertToASCII } from "./utils";
-import { getEmbeddings } from "./embeddings";
+import { getEmbeddings, getEmbeddingsfrompython } from "./embeddings";
 
 export async function getMatchesfromEmbeddings(
   embeddings: number[],
   fileKey: string
 ) {
-  const pinecone = new PineconeClient();
-  await pinecone.init({
-    environment: process.env.PINECONE_ENVIRONMENT!,
+  const pinecone = new Pinecone({
     apiKey: process.env.PINECONE_API_KEY!,
   });
 
-  const index = pinecone.Index("pdfintelliquery");
+  const index = pinecone.Index("chatpdf");
   try {
     const namespace = convertToASCII(fileKey);
 
-    const queryResult = await index.query({
-      queryRequest: {
-        topK: 4,
-        vector: embeddings,
-        includeMetadata: true,
-        namespace,
-      },
+    const queryResult = await index.namespace(namespace).query({
+      topK: 3,
+      vector: embeddings,
+      includeMetadata: true,
     });
+
     return queryResult.matches || [];
   } catch (error) {
     console.log("ERROR GETTING MATCHES", error);
@@ -31,17 +31,17 @@ export async function getMatchesfromEmbeddings(
 }
 
 export async function getContext(query: string, fileKey: string) {
-  const queryEmbeddings = await getEmbeddings(query);
+  const queryEmbeddings = await getEmbeddingsfrompython(query);
 
   const matches = await getMatchesfromEmbeddings(queryEmbeddings, fileKey);
   const qualifyingDocs = matches?.filter(
-    (match) => match.score && match.score > 0.7
+    (match) => match.score && match.score > 0.05
   );
   type metadata = {
     text: string;
     pageNumber: number;
   };
   let docs = qualifyingDocs?.map((doc) => (doc.metadata as metadata).text);
-  // 5 para from 5 vectors
-  return docs?.join("\n").substring(0, 5000);
+
+  return docs?.join("\n");
 }

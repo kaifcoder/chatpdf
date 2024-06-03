@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Input } from "./ui/input";
 import { useChat } from "ai/react";
 import MessageList from "./MessageList";
@@ -13,6 +13,8 @@ type Props = {
 };
 
 const ChatComponent = ({ chatId }: Props) => {
+  const inputref = useRef<HTMLInputElement>();
+
   const { data, isLoading } = useQuery({
     queryKey: ["chat", chatId],
     queryFn: async () => {
@@ -22,6 +24,7 @@ const ChatComponent = ({ chatId }: Props) => {
       return response.data;
     },
   });
+
   const { input, handleInputChange, handleSubmit, messages } = useChat({
     api: "/api/chat",
     body: {
@@ -29,6 +32,8 @@ const ChatComponent = ({ chatId }: Props) => {
     },
     initialMessages: data || [],
   });
+
+  useEffect(() => {}, []);
 
   useEffect(() => {
     const messageContainer = document.getElementById("message-container");
@@ -49,7 +54,11 @@ const ChatComponent = ({ chatId }: Props) => {
         <div className="sticky inset-x-0 top-0 p-3 bg-gray-200">
           <h3 className="text-xl font-bold">Chat</h3>
         </div>
-
+        <p className="max-w-xl p-2 m-4 text-lg text-center text-gray-500 bg-gray-100 rounded-md">
+          {
+            "This is a chat component. You can ask any question and get a response from the AI model."
+          }
+        </p>
         <MessageList message={messages} isLoading={isLoading} />
       </div>
       <form
