@@ -46,6 +46,7 @@ export async function loadS3intoPincone(file_key: string) {
   const docs = await Promise.all(pages.map(prepareDocument));
 
   //3. vectorize the documents
+  // docs = [[doc1, doc2], [doc3, doc4]] -> [doc1, doc2, doc3, doc4]
   const vectors = await processDocs(docs.flat());
 
   //4. upload the vectors to pinecone
@@ -81,7 +82,7 @@ async function embeddDocs(doc: Document) {
     const hash = md5(doc.pageContent);
     return {
       id: hash,
-      values: embedding,
+      values: embedding, // embedding will look like -> [0.1, 0.2, 0.3, 0.4, .......] 384 dimensions
       metadata: {
         text: doc.metadata.text,
         pageNumber: doc.metadata.pageNumber,

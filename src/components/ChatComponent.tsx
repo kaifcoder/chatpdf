@@ -8,12 +8,16 @@ import { Send } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Message } from "ai";
+
 type Props = {
   chatId: number;
 };
 
 const ChatComponent = ({ chatId }: Props) => {
-  const inputref = useRef<HTMLInputElement>();
+  const inputref = useRef<HTMLInputElement>(null);
+  const formref = useRef<HTMLFormElement>(null);
+
+  const [summary, setSummary] = useState<string>("");
 
   const { data, isLoading } = useQuery({
     queryKey: ["chat", chatId],
@@ -33,7 +37,45 @@ const ChatComponent = ({ chatId }: Props) => {
     initialMessages: data || [],
   });
 
-  useEffect(() => {}, []);
+  // // write summize message to the chat component and send it on first time load
+  // useEffect(() => {
+  //   const input = inputref.current;
+  //   if (input) {
+  //     console.log("input", input);
+  //     // focus on the input
+  //     input.focus();
+  //     input.value = "Summarize the document";
+  //     // press enter to send the message
+  //     input.dispatchEvent(new KeyboardEvent("keyup", { key: "Enter" }));
+  //   }
+  //   if (formref.current && inputref.current && inputref  .current.value) {
+  //     console.log("formref", formref);
+  //     formref.current.dispatchEvent(new Event("submit"));
+  //   }
+  // }, [data]);
+
+  // call localhost:8000/api/summarize to get the summary of the document
+  const getSummary = async () => {
+    const response = await fetch("http://127.0.0.1:8000/api/summarize", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch data");
+    }
+    const data = await response.json();
+    setSummary(data.summary);
+
+    // insert this summary to the chat
+
+    return data;
+  };
+
+  useEffect(() => {
+    getSummary();
+  }, []);
 
   useEffect(() => {
     const messageContainer = document.getElementById("message-container");
@@ -59,14 +101,23 @@ const ChatComponent = ({ chatId }: Props) => {
             "This is a chat component. You can ask any question and get a response from the AI model."
           }
         </p>
+        <p>
+          {summary && summary.length > 0 ? (
+            <p className="max-w-xl p-2 m-4 text-gray-900 bg-gray-100 rounded-md text-md">
+              Summary of the PDF: {summary}
+            </p>
+          ) : null}
+        </p>
         <MessageList message={messages} isLoading={isLoading} />
       </div>
       <form
+        ref={formref}
         onSubmit={handleSubmit}
         className="inset-x-0 flex px-1 py-3 mx-1 bg-white sticy"
       >
         <Input
           value={input}
+          ref={inputref}
           onChange={handleInputChange}
           placeholder="Ask any question"
           className="w-full"

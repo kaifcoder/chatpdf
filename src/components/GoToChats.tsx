@@ -3,6 +3,7 @@
 import React from "react";
 import { Button } from "./ui/button";
 import { redirect, useRouter } from "next/navigation";
+import { db } from "@/lib/db";
 
 type Props = {
   auth: boolean;
@@ -14,6 +15,8 @@ const GoToChats = ({ auth }: Props) => {
     if (!auth) {
       router.replace("/sign-in");
     }
+
+    // find the latest chat of the user
     router.push("/chat/1");
   };
   return (
