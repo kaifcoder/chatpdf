@@ -8,6 +8,7 @@ import { Send } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Message } from "ai";
+import Markdown from "./Markdown";
 
 type Props = {
   chatId: number;
@@ -36,23 +37,6 @@ const ChatComponent = ({ chatId }: Props) => {
     },
     initialMessages: data || [],
   });
-
-  // // write summize message to the chat component and send it on first time load
-  // useEffect(() => {
-  //   const input = inputref.current;
-  //   if (input) {
-  //     console.log("input", input);
-  //     // focus on the input
-  //     input.focus();
-  //     input.value = "Summarize the document";
-  //     // press enter to send the message
-  //     input.dispatchEvent(new KeyboardEvent("keyup", { key: "Enter" }));
-  //   }
-  //   if (formref.current && inputref.current && inputref  .current.value) {
-  //     console.log("formref", formref);
-  //     formref.current.dispatchEvent(new Event("submit"));
-  //   }
-  // }, [data]);
 
   // call localhost:8000/api/summarize to get the summary of the document
   const getSummary = async () => {
@@ -102,10 +86,11 @@ const ChatComponent = ({ chatId }: Props) => {
           }
         </p>
         <p>
+          <p className="ml-4 text-sm font-semibold">Summary of the PDF:</p>
           {summary && summary.length > 0 ? (
-            <p className="max-w-xl p-2 m-4 text-gray-900 bg-gray-100 rounded-md text-md">
-              Summary of the PDF: {summary}
-            </p>
+            <div className="max-w-xl p-2 m-4 text-gray-900 bg-gray-100 rounded-md text-md">
+              <Markdown text={`${summary}`} />
+            </div>
           ) : null}
         </p>
         <MessageList message={messages} isLoading={isLoading} />

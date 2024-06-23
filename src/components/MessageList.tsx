@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { Message } from "ai/react";
 import { BotIcon, Loader2, UserIcon } from "lucide-react";
 import React from "react";
+import Markdown from "./Markdown";
 
 type Props = {
   message: Message[];
@@ -35,10 +36,10 @@ const MessageList = ({ message, isLoading }: Props) => {
           <div
             className={cn("rounded-lg", {
               "bg-blue-500 text-white": msg.role === "user",
-              "bg-gray-200 text-gray-900": msg.role === "assistant",
+              "bg-gray-300 text-gray-900": msg.role === "assistant",
             })}
           >
-            <p className="p-2 text-sm">{msg.content}</p>
+            <Markdown text={msg.content} />
           </div>
         </div>
       ))}

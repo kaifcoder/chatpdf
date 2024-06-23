@@ -10,7 +10,7 @@ export default async function Home() {
   const isAuth = !!userId;
 
   return (
-    <div className="w-screen min-h-screen bg-gradient-to-r from-red-200 via-purple-100 to-violet-400 ">
+    <div className="w-screen min-h-screen animate-gradient-x sm:bg-gradient-to-r sm:from-red-200 sm:via-purple-100 sm:to-violet-400 ">
       {isAuth && (
         <div className="flex justify-end p-4 ">
           <div className="p-2 rounded-xl bg-white/60">
@@ -23,6 +23,9 @@ export default async function Home() {
           <div className="flex items-center">
             <h1 className="mr-3 text-5xl font-semibold">PDF IntelliQuery</h1>
           </div>
+          <h2 className="mt-2 text-2xl font-semibold text-slate-800 sm:text-3xl">
+            (AI powered pdf summarization/query web application)
+          </h2>
           <GoToChats auth={isAuth} />
           <p className="max-w-xl mt-2 text-lg text-slate-600">
             Join millions of students, researchers and professionals who use PDF

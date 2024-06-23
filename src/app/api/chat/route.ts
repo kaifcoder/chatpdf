@@ -1,5 +1,12 @@
 import { Configuration, OpenAIApi } from "openai-edge";
-import { OpenAIStream, StreamingTextResponse, Message } from "ai";
+import {
+  StreamingTextResponse,
+  Message,
+  generateText,
+  GoogleGenerativeAIStream,
+} from "ai";
+import { createStreamableValue } from "ai/rsc";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getContext } from "@/lib/context";
 import { db } from "@/lib/db";
 import { chats, messages as _messages } from "@/lib/db/schema";
@@ -8,11 +15,18 @@ import { NextResponse } from "next/server";
 
 export const runtime = "edge";
 
-const config = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// const config = new Configuration({
+//   apiKey: process.env.GEMINI_API_KEY,
+// });
 
-const openai = new OpenAIApi(config);
+// const openai = new OpenAIApi(config);
+
+// import { createGoogleGenerativeAI } from "@ai-sdk/google";
+
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
+const model = genAI.getGenerativeModel({
+  model: "gemini-pro",
+});
 
 export async function POST(req: Request) {
   try {
@@ -51,16 +65,21 @@ export async function POST(req: Request) {
         AI assistant will not invent anything that is not drawn directly from the context.
         `,
     };
-    const response = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
+    const messagesWithPrompt = [
+      prompt,
+      ...messages.filter((message: Message) => message.role === "user"),
+      {
+        role: "user",
+        content:
+          "Only Answer the Last Question. Do not repeat the previous response.",
+      },
+    ];
 
-      messages: [
-        prompt,
-        ...messages.filter((message: Message) => message.role === "user"),
-      ],
-      stream: true,
-    });
-    const stream = OpenAIStream(response, {
+    const finalPrompt = JSON.stringify(messagesWithPrompt);
+    console.log("MESSAGES WITH PROMPT", messagesWithPrompt);
+
+    const response = await model.generateContentStream(finalPrompt);
+    const stream = GoogleGenerativeAIStream(response, {
       onStart: async () => {
         await db.insert(_messages).values({
           chatId: chatId,

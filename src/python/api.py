@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
 from langchain.chains.llm import LLMChain
 from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate
 import dotenv
 
@@ -60,7 +61,7 @@ def summarize_text():
                         CONCISE SUMMARY:"""
     prompt = PromptTemplate.from_template(prompt_template)
     # Define LLM chain
-    llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo")
+    llm = ChatGoogleGenerativeAI(model="gemini-pro")  # type: ignore
     llm_chain = LLMChain(llm=llm, prompt=prompt)
 
     # Define StuffDocumentsChain

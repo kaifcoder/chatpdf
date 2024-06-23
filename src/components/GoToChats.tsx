@@ -2,8 +2,7 @@
 
 import React from "react";
 import { Button } from "./ui/button";
-import { redirect, useRouter } from "next/navigation";
-import { db } from "@/lib/db";
+import { useRouter } from "next/navigation";
 
 type Props = {
   auth: boolean;
@@ -17,7 +16,7 @@ const GoToChats = ({ auth }: Props) => {
     }
 
     // find the latest chat of the user
-    router.push("/chat/1");
+    router.push("/chat/40");
   };
   return (
     <div className="flex mt-3">
